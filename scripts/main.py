@@ -1,17 +1,35 @@
-from config import SINGLE_ENV_PATH
+from config import SINGLE_ENV_PATH, DISCOUNT
 
 from unity import *
+from utils import reinforce, Agent
 
-env = get_env(SINGLE_ENV_PATH)
+import torch.optim as optim
 
-brain_name = get_brain_names(env)
-brain = get_brain(env, brain_name)
+from modelling import FullyConnectedModel
 
-env_info = reset_environment(env, brain_name, train = False)
+import torch
 
-print(f"Num states : {num_states(env_info)}")
-print(f"Num Actions : {num_actions(brain)}")
-print(f"Num Agents : {num_agents(env_info)}")
+
+env = Env(SINGLE_ENV_PATH)
+
+brain_name = env.get_brain_names()
+brain = env.get_brain()
+
+env_info = env.reset_environment(train = False)
+
+print("Current state : ", env.get_state())
+
+input_shape = env.num_states()
+output_shape = env.num_actions()
+
+
+print(f"Num states : {env.num_states()}")
+print(f"Num Actions : {env.num_actions()}")
+print(f"Num Agents : {env.num_agents()}")
+
+agent = Agent(input_shape, output_shape)
+
+reinforce(env, agent, n_episodes=1000, max_t=1000, gamma=DISCOUNT, print_every=4)
 
 
 env.close()
