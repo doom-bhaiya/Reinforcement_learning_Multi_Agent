@@ -5,8 +5,10 @@ from torch.distributions import Categorical
 
 
 class FullyConnectedModel(nn.Module):
-    def __init__(self, input_size, output_size, dropout_rate=0.2):
+    def __init__(self, input_size, output_size, dropout_rate=0.0):
         super(FullyConnectedModel, self).__init__()
+
+
         self.fc1 = nn.Linear(input_size, 64)
         self.dropout1 = nn.Dropout(dropout_rate)
         
