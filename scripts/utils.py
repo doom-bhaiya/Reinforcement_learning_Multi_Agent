@@ -10,15 +10,16 @@ import random
 
 class Agent:
 
-    def __init__(self, input_size, output_size):
+    def __init__(self, input_size, output_size, train = False):
 
         self.input_size = input_size
         self.output_size = output_size
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.policy = FullyConnectedModel(self.input_size, self.output_size).to(self.device)
-        self.optimizer = optim.Adam(self.policy.parameters(), lr=1e-2)
+        self.optimizer = optim.Adam(self.policy.parameters(), lr=1e-3)
+        self.train = train
 
-    def act(self, state, eps=0.):
+    def act(self, state, eps=0.2):
         """Returns actions for given state as per current policy.
         
         Params
@@ -36,11 +37,18 @@ class Agent:
         action_values = self.policy(state)
         self.policy.train()
 
+        if random.random() > eps:
+            return action_values
+        else:
+            action_values = ((torch.randn(1, 4) - 0.5) * 2).requires_grad_(True).to(self.device)
+            # print(action_values)
+            return action_values
+
         # if self.train == False:
         #     time.sleep(0.025)
         # Epsilon-greedy action selection
         # print(action_values)
-        return action_values
+        # return action_values
 
 
 def reinforce(environment, agent, n_episodes=1000, max_t=1000, gamma=1.0, print_every=10):

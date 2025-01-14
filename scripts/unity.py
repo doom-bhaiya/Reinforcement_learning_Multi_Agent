@@ -52,7 +52,7 @@ class Env:
         next_states = self.env_info.vector_observations        
         rewards = self.env_info.rewards                        
         dones = self.env_info.local_done
-        
+
         return next_states, rewards[0], dones
 
     def close(self):
