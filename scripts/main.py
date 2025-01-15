@@ -1,13 +1,9 @@
-from config import SINGLE_ENV_PATH, DISCOUNT
+from config import SINGLE_ENV_PATH, DISCOUNT, TAU
 
 from unity import *
-from utils import reinforce, Agent
+from utils import ddpg
 
-import torch.optim as optim
-
-from modelling import FullyConnectedModel
-
-import torch
+from ddpg_agent import Agent
 
 
 env = Env(SINGLE_ENV_PATH)
@@ -27,9 +23,11 @@ print(f"Num states : {env.num_states()}")
 print(f"Num Actions : {env.num_actions()}")
 print(f"Num Agents : {env.num_agents()}")
 
-agent = Agent(input_shape, output_shape)
+agent = Agent(input_shape, output_shape, TAU)
 
-reinforce(env, agent, n_episodes=1000, max_t=1000, gamma=DISCOUNT, print_every=4)
+print("hello")
 
+# reinforce(env, agent, n_episodes=1000, max_t=1000, gamma=DISCOUNT, print_every=4)
+ddpg(agent, env, n_episodes=2000, max_t=700)
 
 env.close()

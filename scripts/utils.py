@@ -10,7 +10,7 @@ import random
 
 class Agent:
 
-    def __init__(self, input_size, output_size, train = False):
+    def __init__(self, input_size, output_size, train = True):
 
         self.input_size = input_size
         self.output_size = output_size
@@ -34,7 +34,7 @@ class Agent:
 
 
 def reinforce(environment, agent, n_episodes=1000, max_t=1000, gamma=1.0, print_every=10):
-    
+
     environment.reset_environment(train = False)
     scores_deque = deque(maxlen=100)
     scores = []
@@ -60,7 +60,7 @@ def reinforce(environment, agent, n_episodes=1000, max_t=1000, gamma=1.0, print_
             # agent.optimizer.zero_grad()
             # policy_loss.backward()
             # agent.optimizer.step()
-            if (num_step % 10 == 0):
+            if (num_step > 10 == 0):
                 discounts = [gamma**i for i in range(len(rewards[-10 : ])+1)]
                 R = sum([a*b for a,b in zip(discounts, rewards[-10 : ])])
                 
@@ -100,4 +100,36 @@ def reinforce(environment, agent, n_episodes=1000, max_t=1000, gamma=1.0, print_
             print('Environment solved in {:d} episodes!\tAverage Score: {:.2f}'.format(i_episode-100, np.mean(scores_deque)))
             break
         
+    return scores
+
+
+
+def ddpg(agent, env, n_episodes=2000, max_t=700):
+
+    env.reset_environment(train = False)
+    scores_deque = deque(maxlen=100)
+    scores = []
+    max_score = -np.Inf
+    
+    for i_episode in range(1, n_episodes+1):
+
+        env.reset_environment()
+        state = env.get_state()
+        score = 0
+        for t in range(max_t):
+            action = agent.act(state)
+            # print(action)
+            # action_detach = action.detach().numpy()
+            next_state, reward, done = env.step(action)
+            agent.step(state, action, reward, next_state, done)
+            state = next_state
+            score += reward
+            if not done:
+                break 
+        scores_deque.append(score)
+        scores.append(score)
+        print('\rEpisode {}\tAverage Score: {:.2f}\tScore: {:.2f}'.format(i_episode, np.mean(scores_deque), score), end="")
+        if i_episode % 100 == 0:
+            torch.save(agent.actor_critic_local.state_dict(), 'checkpoint_actor_critic.pth')
+            print('\rEpisode {}\tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_deque)))   
     return scores

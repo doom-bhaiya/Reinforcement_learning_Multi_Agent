@@ -1,3 +1,9 @@
 SINGLE_ENV_PATH = "Reacher_Windows_x86_64_Single/Reacher.exe"
 
-DISCOUNT = 1
+DISCOUNT = 0.9
+BUFFER_SIZE = 100
+BATCH_SIZE = 64
+
+LR = 1e-3
+WEIGHT_DECAY = 1e-4
+TAU = 1e-3
